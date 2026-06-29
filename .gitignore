@@ -6,3 +6,4 @@ dist
 .nitro
 .output
 *.local
+.wrangler

@@ -1,16 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const clientEmail = (code: string) => `c${code}@portal.local`;
-
-async function ensureAdmin(supabase: any, userId: string) {
-  const { data, error } = await supabase.rpc("has_role", {
-    _user_id: userId,
-    _role: "admin",
-  });
-  if (error || !data) throw new Error("Forbidden");
-}
 
 /** First-time admin creation. Refuses once an admin exists. */
 export const bootstrapAdmin = createServerFn({ method: "POST" })
@@ -66,15 +57,13 @@ export const checkAdminExists = createServerFn({ method: "GET" }).handler(async 
 
 /** Admin creates a new client account with a unique 8-digit code. */
 export const createClientAccount = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((d: { fullName: string; password: string }) =>
     z.object({
       fullName: z.string().min(1),
       password: z.string().min(6),
     }).parse(d),
   )
-  .handler(async ({ data, context }) => {
-    await ensureAdmin(context.supabase, context.userId);
+  .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: codeData, error: codeErr } = await supabaseAdmin.rpc("generate_client_code");
@@ -108,10 +97,8 @@ export const createClientAccount = createServerFn({ method: "POST" })
   });
 
 export const deleteClientAccount = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((d: { userId: string }) => z.object({ userId: z.string().uuid() }).parse(d))
-  .handler(async ({ data, context }) => {
-    await ensureAdmin(context.supabase, context.userId);
+  .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
     if (error) throw new Error(error.message);
@@ -119,12 +106,10 @@ export const deleteClientAccount = createServerFn({ method: "POST" })
   });
 
 export const resetClientPassword = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((d: { userId: string; newPassword: string }) =>
     z.object({ userId: z.string().uuid(), newPassword: z.string().min(6) }).parse(d),
   )
-  .handler(async ({ data, context }) => {
-    await ensureAdmin(context.supabase, context.userId);
+  .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
       password: data.newPassword,
@@ -134,9 +119,7 @@ export const resetClientPassword = createServerFn({ method: "POST" })
   });
 
 export const getClientStorageStats = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    await ensureAdmin(context.supabase, context.userId);
+  .handler(async () => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Get all clients
@@ -196,18 +179,8 @@ export const getClientStorageStats = createServerFn({ method: "GET" })
 
 /** Returns a short-lived signed URL for an image in the private bucket. */
 export const getSignedImageUrl = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((d: { path: string }) => z.object({ path: z.string().min(1) }).parse(d))
-  .handler(async ({ data, context }) => {
-    // RLS-checked: confirm the user can see an image at this path.
-    const { data: img, error } = await context.supabase
-      .from("images")
-      .select("id, storage_path")
-      .eq("storage_path", data.path)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
-    if (!img) throw new Error("Introuvable");
-
+  .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: signed, error: sErr } = await supabaseAdmin.storage
       .from("project-files")

@@ -16,10 +16,10 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Camera, LogOut, Plus, Users, Folder, Trash2, Copy, Key, Eye, LayoutDashboard, HardDrive, Image as ImageIcon, FolderOpen } from "lucide-react";
+import { Camera, LogOut, Plus, Users, Folder, Trash2, Copy, Key, LayoutDashboard, HardDrive, Image as ImageIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Tableau de bord" }] }),
+  head: () => ({ meta: [{ title: "Tableau de bord — Studio Client" }] }),
   component: Dashboard,
 });
 
@@ -33,28 +33,35 @@ function Dashboard() {
   }
 
   if (auth.loading) {
-    return <div className="grid min-h-screen place-items-center text-muted-foreground">Chargement…</div>;
+    return (
+      <div className="grid min-h-screen place-items-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <span className="text-sm text-muted-foreground">Chargement…</span>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground">
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-card/80 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
+          <Link to="/dashboard" className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <Camera className="h-4 w-4" />
             </div>
-            <span className="font-semibold">Studio Client</span>
+            <span className="text-base font-semibold tracking-tight">Studio Client</span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <div className="hidden text-right sm:block">
               <div className="text-sm font-medium">{auth.fullName ?? auth.email}</div>
               <div className="text-xs text-muted-foreground">
                 {auth.role === "admin" ? "Administrateur" : `Client · ${auth.clientCode}`}
               </div>
             </div>
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="mr-2 h-4 w-4" /> Déconnexion
+            <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground hover:text-foreground">
+              <LogOut className="mr-1.5 h-4 w-4" /> Déconnexion
             </Button>
           </div>
         </div>
@@ -137,7 +144,6 @@ function AdminView() {
 
   const totalStorage = stats.reduce((sum, s) => sum + s.totalBytes, 0);
   const totalImages = stats.reduce((sum, s) => sum + s.imageCount, 0);
-  const totalProjects = stats.reduce((sum, s) => sum + s.projectCount, 0);
 
   function formatBytes(bytes: number) {
     if (bytes === 0) return "0 o";
@@ -151,88 +157,67 @@ function AdminView() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold">
-            <LayoutDashboard className="h-6 w-6 text-primary" /> Tableau de bord Admin
-          </h1>
-          <p className="text-sm text-muted-foreground">Vue d'ensemble de tous les clients.</p>
+          <h1 className="text-2xl font-bold tracking-tight">Tableau de bord</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Vue d'ensemble de tous les clients.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" /> Nouveau client</Button>
+            <Button className="shadow-sm">
+              <Plus className="mr-1.5 h-4 w-4" /> Nouveau client
+            </Button>
           </DialogTrigger>
           <CreateClientDialog onSubmit={handleCreate} />
         </Dialog>
       </div>
 
       {created && (
-        <Card className="mt-6 border-primary/40 bg-accent p-5">
-          <div className="font-semibold">Client créé : {created.name}</div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Communiquez ces identifiants au client. Le mot de passe ne sera plus affiché.
-          </p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <Card className="mt-6 border-primary/20 bg-primary/5 p-5 shadow-sm">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="font-semibold text-primary">Client créé : {created.name}</div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Communiquez ces identifiants au client. Le mot de passe ne sera plus affiché.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <CredField label="Code client" value={created.code} />
             <CredField label="Mot de passe" value={created.password} />
           </div>
-          <Button variant="outline" size="sm" className="mt-3" onClick={() => setCreated(null)}>
+          <Button variant="outline" size="sm" className="mt-4" onClick={() => setCreated(null)}>
             Fermer
           </Button>
         </Card>
       )}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-full bg-primary/10 p-2">
-              <Users className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold">{clients.length}</div>
-              <div className="text-sm text-muted-foreground">Clients</div>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-full bg-primary/10 p-2">
-              <HardDrive className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold">{formatBytes(totalStorage)}</div>
-              <div className="text-sm text-muted-foreground">Stockage total</div>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="rounded-full bg-primary/10 p-2">
-              <ImageIcon className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold">{totalImages}</div>
-              <div className="text-sm text-muted-foreground">Images total</div>
-            </div>
-          </div>
-        </Card>
+        <StatCard icon={Users} label="Clients" value={clients.length.toString()} />
+        <StatCard icon={HardDrive} label="Stockage total" value={formatBytes(totalStorage)} />
+        <StatCard icon={ImageIcon} label="Images total" value={totalImages.toString()} />
       </div>
 
-      <Tabs defaultValue="clients" className="mt-6" onValueChange={(v) => v === "storage" && !stats.length && loadStats()}>
+      <Tabs defaultValue="clients" className="mt-8" onValueChange={(v) => v === "storage" && !stats.length && loadStats()}>
         <TabsList>
-          <TabsTrigger value="clients"><Users className="mr-2 h-4 w-4" />Clients</TabsTrigger>
-          <TabsTrigger value="storage"><HardDrive className="mr-2 h-4 w-4" />Stockage</TabsTrigger>
+          <TabsTrigger value="clients"><Users className="mr-1.5 h-4 w-4" />Clients</TabsTrigger>
+          <TabsTrigger value="storage"><HardDrive className="mr-1.5 h-4 w-4" />Stockage</TabsTrigger>
         </TabsList>
 
         <TabsContent value="clients" className="mt-4">
-          <Card className="overflow-hidden">
-            <div className="border-b bg-muted/50 px-4 py-3">
-              <h2 className="font-semibold">Liste des clients ({clients.length})</h2>
+          <Card className="overflow-hidden shadow-sm">
+            <div className="border-b border-border/50 bg-muted/30 px-5 py-3.5">
+              <h2 className="text-sm font-semibold">Liste des clients ({clients.length})</h2>
             </div>
             {loading ? (
-              <div className="py-12 text-center text-muted-foreground">Chargement…</div>
+              <div className="flex items-center justify-center py-16">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
             ) : clients.length === 0 ? (
-              <div className="py-12 text-center text-muted-foreground">
-                <Users className="mx-auto h-10 w-10" />
-                <p className="mt-3">Aucun client pour le moment.</p>
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
+                  <Users className="h-7 w-7 text-muted-foreground" />
+                </div>
+                <p className="mt-4 text-sm font-medium text-foreground">Aucun client</p>
+                <p className="mt-1 text-sm text-muted-foreground">Créez votre premier client pour commencer.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -242,7 +227,7 @@ function AdminView() {
                       <TableHead>Nom</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Code client</TableHead>
-                      <TableHead>Date création</TableHead>
+                      <TableHead>Créé le</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -250,13 +235,13 @@ function AdminView() {
                     {clients.map((c) => (
                       <TableRow key={c.id}>
                         <TableCell className="font-medium">
-                          <Link to="/clients/$clientId" params={{ clientId: c.id }} className="hover:text-primary">
+                          <Link to="/clients/$clientId" params={{ clientId: c.id }} className="transition-colors-fast hover:text-primary">
                             {c.full_name || "Sans nom"}
                           </Link>
                         </TableCell>
                         <TableCell className="text-muted-foreground">{c.email || "—"}</TableCell>
                         <TableCell>
-                          <span className="rounded bg-primary/10 px-2 py-0.5 font-mono text-sm text-primary">
+                          <span className="inline-flex items-center rounded-md bg-primary/10 px-2.5 py-1 font-mono text-sm font-medium text-primary">
                             {c.client_code || "—"}
                           </span>
                         </TableCell>
@@ -266,13 +251,13 @@ function AdminView() {
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
                             <Button
-                              variant="ghost" size="icon"
+                              variant="ghost" size="icon" className="h-8 w-8"
                               onClick={() => { setResetClient({ id: c.id, name: c.full_name || "Client" }); setOpenReset(true); }}
                               title="Réinitialiser mot de passe"
                             >
                               <Key className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleDelete(c.id, c.full_name)}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(c.id, c.full_name)}>
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
                           </div>
@@ -287,16 +272,21 @@ function AdminView() {
         </TabsContent>
 
         <TabsContent value="storage" className="mt-4">
-          <Card className="overflow-hidden">
-            <div className="border-b bg-muted/50 px-4 py-3">
-              <h2 className="font-semibold">Stockage par client</h2>
+          <Card className="overflow-hidden shadow-sm">
+            <div className="border-b border-border/50 bg-muted/30 px-5 py-3.5">
+              <h2 className="text-sm font-semibold">Stockage par client</h2>
             </div>
             {loadingStats ? (
-              <div className="py-12 text-center text-muted-foreground">Chargement…</div>
+              <div className="flex items-center justify-center py-16">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
             ) : stats.length === 0 ? (
-              <div className="py-12 text-center text-muted-foreground">
-                <HardDrive className="mx-auto h-10 w-10" />
-                <p className="mt-3">Aucune donnée de stockage.</p>
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
+                  <HardDrive className="h-7 w-7 text-muted-foreground" />
+                </div>
+                <p className="mt-4 text-sm font-medium text-foreground">Aucune donnée</p>
+                <p className="mt-1 text-sm text-muted-foreground">Les statistiques apparaîtront une fois des fichiers uploadés.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -315,20 +305,20 @@ function AdminView() {
                     {stats.map((s) => (
                       <TableRow key={s.userId}>
                         <TableCell className="font-medium">
-                          <Link to="/clients/$clientId" params={{ clientId: s.userId }} className="hover:text-primary">
+                          <Link to="/clients/$clientId" params={{ clientId: s.userId }} className="transition-colors-fast hover:text-primary">
                             {s.name}
                           </Link>
                         </TableCell>
                         <TableCell>
-                          <span className="rounded bg-primary/10 px-2 py-0.5 font-mono text-sm text-primary">
+                          <span className="inline-flex items-center rounded-md bg-primary/10 px-2.5 py-1 font-mono text-sm font-medium text-primary">
                             {s.clientCode}
                           </span>
                         </TableCell>
                         <TableCell className="text-muted-foreground">{s.projectCount}</TableCell>
                         <TableCell className="text-muted-foreground">{s.imageCount}</TableCell>
-                        <TableCell className="text-right font-mono">{formatBytes(s.totalBytes)}</TableCell>
+                        <TableCell className="text-right font-mono text-sm">{formatBytes(s.totalBytes)}</TableCell>
                         <TableCell>
-                          <Progress value={totalStorage ? (s.totalBytes / totalStorage) * 100 : 0} className="w-20" />
+                          <Progress value={totalStorage ? (s.totalBytes / totalStorage) * 100 : 0} className="w-24" />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -350,10 +340,11 @@ function AdminView() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="newPw">Nouveau mot de passe</Label>
+              <Label htmlFor="newPw" className="text-sm font-medium">Nouveau mot de passe</Label>
               <Input
                 id="newPw" type="text" value={newPassword} maxLength={100}
                 onChange={(e) => setNewPassword(e.target.value)} placeholder="Min. 6 caractères"
+                className="mt-1.5"
               />
             </div>
             <DialogFooter>
@@ -366,6 +357,22 @@ function AdminView() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function StatCard({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
+  return (
+    <Card className="p-5 shadow-sm transition-all-fast hover:shadow-card-hover">
+      <div className="flex items-center gap-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Icon className="h-5 w-5" />
+        </div>
+        <div>
+          <div className="text-2xl font-bold tracking-tight">{value}</div>
+          <div className="text-sm text-muted-foreground">{label}</div>
+        </div>
+      </div>
+    </Card>
   );
 }
 
@@ -389,13 +396,13 @@ function CreateClientDialog({ onSubmit }: { onSubmit: (n: string, p: string) => 
         className="space-y-4"
       >
         <div>
-          <Label htmlFor="cname">Nom du client</Label>
-          <Input id="cname" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} />
+          <Label htmlFor="cname" className="text-sm font-medium">Nom du client</Label>
+          <Input id="cname" value={name} onChange={(e) => setName(e.target.value)} required maxLength={100} className="mt-1.5" />
         </div>
         <div>
-          <Label htmlFor="cpw">Mot de passe initial</Label>
-          <Input id="cpw" type="text" value={pw} onChange={(e) => setPw(e.target.value)} required maxLength={100} />
-          <p className="mt-1 text-xs text-muted-foreground">À communiquer au client.</p>
+          <Label htmlFor="cpw" className="text-sm font-medium">Mot de passe initial</Label>
+          <Input id="cpw" type="text" value={pw} onChange={(e) => setPw(e.target.value)} required maxLength={100} className="mt-1.5" />
+          <p className="mt-1.5 text-xs text-muted-foreground">À communiquer au client.</p>
         </div>
         <DialogFooter><Button type="submit">Créer</Button></DialogFooter>
       </form>
@@ -405,11 +412,11 @@ function CreateClientDialog({ onSubmit }: { onSubmit: (n: string, p: string) => 
 
 function CredField({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border bg-background p-3">
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="mt-1 flex items-center justify-between gap-2">
-        <span className="font-mono text-lg font-semibold">{value}</span>
-        <Button variant="ghost" size="icon"
+    <div className="rounded-lg border border-border/50 bg-background p-3.5">
+      <div className="text-xs font-medium text-muted-foreground">{label}</div>
+      <div className="mt-1.5 flex items-center justify-between gap-2">
+        <span className="font-mono text-lg font-semibold tracking-wide">{value}</span>
+        <Button variant="ghost" size="icon" className="h-8 w-8"
           onClick={() => { navigator.clipboard.writeText(value); toast.success("Copié"); }}>
           <Copy className="h-4 w-4" />
         </Button>
@@ -427,26 +434,31 @@ function ClientView() {
   }, []);
   return (
     <div>
-      <h1 className="text-2xl font-bold">Mes projets</h1>
-      <p className="text-sm text-muted-foreground">Cliquez sur un projet pour accéder à vos photos.</p>
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <h1 className="text-2xl font-bold tracking-tight">Mes projets</h1>
+      <p className="mt-1 text-sm text-muted-foreground">Cliquez sur un projet pour accéder à vos photos.</p>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {loading ? (
-          <div className="col-span-full py-12 text-center text-muted-foreground">Chargement…</div>
+          <div className="col-span-full flex items-center justify-center py-16">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          </div>
         ) : projects.length === 0 ? (
-          <Card className="col-span-full py-12 text-center">
-            <Folder className="mx-auto h-10 w-10 text-muted-foreground" />
-            <p className="mt-3 text-sm text-muted-foreground">
-              Aucun projet disponible pour le moment.
-            </p>
+          <Card className="col-span-full flex flex-col items-center justify-center py-16 shadow-sm">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
+              <Folder className="h-7 w-7 text-muted-foreground" />
+            </div>
+            <p className="mt-4 text-sm font-medium text-foreground">Aucun projet</p>
+            <p className="mt-1 text-sm text-muted-foreground">Vos projets apparaîtront ici une fois créés par l'agence.</p>
           </Card>
         ) : (
           projects.map((p) => (
             <Link key={p.id} to="/projects/$projectId" params={{ projectId: p.id }}>
-              <Card className="p-5 transition hover:border-primary">
-                <Folder className="h-8 w-8 text-primary" />
-                <div className="mt-3 font-semibold">{p.name}</div>
-                {p.description && <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>}
-                <div className="mt-2 text-xs text-muted-foreground">
+              <Card className="group p-5 shadow-sm transition-all-fast hover:border-primary/50 hover:shadow-card-hover">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all-fast group-hover:bg-primary group-hover:text-primary-foreground">
+                  <Folder className="h-5 w-5" />
+                </div>
+                <div className="mt-4 font-semibold tracking-tight">{p.name}</div>
+                {p.description && <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{p.description}</p>}
+                <div className="mt-3 text-xs text-muted-foreground">
                   {new Date(p.created_at).toLocaleDateString("fr-FR")}
                 </div>
               </Card>

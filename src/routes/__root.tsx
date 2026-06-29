@@ -23,14 +23,16 @@ function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-primary">404</h1>
-        <h2 className="mt-4 text-xl font-semibold">Page introuvable</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary mx-auto">
+          <span className="text-3xl font-bold">404</span>
+        </div>
+        <h2 className="mt-6 text-xl font-bold tracking-tight">Page introuvable</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           La page demandée n'existe pas ou a été déplacée.
         </p>
         <Link
           to="/"
-          className="mt-6 inline-flex rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+          className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all-fast hover:bg-primary/90 hover:shadow-md"
         >
           Retour à l'accueil
         </Link>
@@ -49,18 +51,23 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold">Une erreur est survenue</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive mx-auto">
+          <span className="text-2xl font-bold">!</span>
+        </div>
+        <h2 className="mt-6 text-xl font-bold tracking-tight">Une erreur est survenue</h2>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           {error.message ?? "Réessayez ou revenez à l'accueil."}
         </p>
-        <div className="mt-6 flex justify-center gap-2">
+        <div className="mt-6 flex justify-center gap-3">
           <button
             onClick={() => { router.invalidate(); reset(); }}
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all-fast hover:bg-primary/90 hover:shadow-md"
           >
             Réessayer
           </button>
-          <a href="/" className="rounded-md border px-4 py-2 text-sm font-medium">Accueil</a>
+          <a href="/" className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-5 py-2.5 text-sm font-medium transition-all-fast hover:bg-muted">
+            Accueil
+          </a>
         </div>
       </div>
     </div>

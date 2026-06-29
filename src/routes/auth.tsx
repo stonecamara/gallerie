@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Camera } from "lucide-react";
+import { Camera, ArrowRight, Lock, User } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Connexion — Studio Client" }] }),
@@ -32,27 +32,41 @@ function AuthPage() {
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <Link to="/" className="flex items-center gap-2">
-          <Camera className="h-6 w-6" />
-          <span className="font-semibold">Studio Client</span>
+      <div className="hidden bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
+        <Link to="/" className="flex items-center gap-2.5">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+            <Camera className="h-5 w-5" />
+          </div>
+          <span className="text-lg font-semibold">Studio Client</span>
         </Link>
         <div>
-          <h2 className="text-3xl font-bold leading-tight">
+          <h2 className="text-3xl font-bold leading-tight tracking-tight">
             Vos projets photo,<br />à portée de clic.
           </h2>
-          <p className="mt-4 max-w-md text-primary-foreground/80">
+          <p className="mt-4 max-w-md text-lg leading-relaxed text-primary-foreground/80">
             Connectez-vous avec votre code à 8 chiffres remis par l'agence pour retrouver
             vos livraisons.
           </p>
+          <div className="mt-8 flex items-center gap-6 text-sm text-primary-foreground/70">
+            <div className="flex items-center gap-2">
+              <Lock className="h-4 w-4" />
+              Accès sécurisé
+            </div>
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Espace personnalisé
+            </div>
+          </div>
         </div>
-        <p className="text-sm text-primary-foreground/70">© {new Date().getFullYear()} Studio Client</p>
+        <p className="text-sm text-primary-foreground/60">© {new Date().getFullYear()} Studio Client — Tous droits réservés</p>
       </div>
 
       <div className="flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-md">
           <Link to="/" className="mb-8 inline-flex items-center gap-2 lg:hidden">
-            <Camera className="h-5 w-5 text-primary" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Camera className="h-4 w-4" />
+            </div>
             <span className="font-semibold">Studio Client</span>
           </Link>
 
@@ -67,10 +81,10 @@ function AuthPage() {
             />
           ) : (
             <>
-              <h1 className="text-2xl font-bold">Bienvenue</h1>
-              <p className="mt-1 text-sm text-muted-foreground">Connectez-vous à votre espace.</p>
+              <h1 className="text-2xl font-bold tracking-tight">Bienvenue</h1>
+              <p className="mt-1.5 text-sm text-muted-foreground">Connectez-vous à votre espace client.</p>
 
-              <Tabs value={mode} onValueChange={(v) => setMode(v as "client" | "admin")} className="mt-6">
+              <Tabs value={mode} onValueChange={(v) => setMode(v as "client" | "admin")} className="mt-8">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="client">Client</TabsTrigger>
                   <TabsTrigger value="admin">Administrateur</TabsTrigger>
@@ -111,9 +125,9 @@ function ClientLogin({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form onSubmit={submit} className="space-y-5">
       <div>
-        <Label htmlFor="code">Code client (8 chiffres)</Label>
+        <Label htmlFor="code" className="text-sm font-medium">Code client</Label>
         <Input
           id="code"
           inputMode="numeric"
@@ -121,16 +135,27 @@ function ClientLogin({ onSuccess }: { onSuccess: () => void }) {
           placeholder="12345678"
           value={code}
           onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-          className="mt-1 tracking-widest"
+          className="mt-1.5 h-12 tracking-[0.3em] text-center text-lg font-mono"
           required
         />
+        <p className="mt-1.5 text-xs text-muted-foreground">8 chiffres remis par l'agence</p>
       </div>
       <div>
-        <Label htmlFor="pw">Mot de passe</Label>
-        <Input id="pw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1" required />
+        <Label htmlFor="pw" className="text-sm font-medium">Mot de passe</Label>
+        <Input id="pw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1.5 h-12" required />
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Connexion…" : "Se connecter"}
+      <Button type="submit" className="h-12 w-full text-sm font-medium" disabled={loading}>
+        {loading ? (
+          <span className="flex items-center gap-2">
+            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+            Connexion…
+          </span>
+        ) : (
+          <span className="flex items-center gap-2">
+            Se connecter
+            <ArrowRight className="h-4 w-4" />
+          </span>
+        )}
       </Button>
     </form>
   );
@@ -149,17 +174,27 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
     onSuccess();
   }
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form onSubmit={submit} className="space-y-5">
       <div>
-        <Label htmlFor="aemail">Email</Label>
-        <Input id="aemail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1" required />
+        <Label htmlFor="aemail" className="text-sm font-medium">Email</Label>
+        <Input id="aemail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1.5 h-12" required />
       </div>
       <div>
-        <Label htmlFor="apw">Mot de passe</Label>
-        <Input id="apw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1" required />
+        <Label htmlFor="apw" className="text-sm font-medium">Mot de passe</Label>
+        <Input id="apw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1.5 h-12" required />
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Connexion…" : "Se connecter"}
+      <Button type="submit" className="h-12 w-full text-sm font-medium" disabled={loading}>
+        {loading ? (
+          <span className="flex items-center gap-2">
+            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+            Connexion…
+          </span>
+        ) : (
+          <span className="flex items-center gap-2">
+            Se connecter
+            <ArrowRight className="h-4 w-4" />
+          </span>
+        )}
       </Button>
     </form>
   );
@@ -179,21 +214,34 @@ function BootstrapForm({ onDone }: { onDone: (email: string, password: string) =
   }
   return (
     <div>
-      <h1 className="text-2xl font-bold">Première utilisation</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
+        <Lock className="h-6 w-6" />
+      </div>
+      <h1 className="text-2xl font-bold tracking-tight">Première utilisation</h1>
+      <p className="mt-1.5 text-sm text-muted-foreground">
         Créez le compte administrateur principal de l'agence.
       </p>
-      <form onSubmit={submit} className="mt-6 space-y-4">
+      <form onSubmit={submit} className="mt-6 space-y-5">
         <div>
-          <Label htmlFor="bemail">Email administrateur</Label>
-          <Input id="bemail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1" required />
+          <Label htmlFor="bemail" className="text-sm font-medium">Email administrateur</Label>
+          <Input id="bemail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1.5 h-12" required />
         </div>
         <div>
-          <Label htmlFor="bpw">Mot de passe (8+ caractères)</Label>
-          <Input id="bpw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1" required />
+          <Label htmlFor="bpw" className="text-sm font-medium">Mot de passe (8+ caractères)</Label>
+          <Input id="bpw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1.5 h-12" required />
         </div>
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Création…" : "Créer le compte"}
+        <Button type="submit" className="h-12 w-full text-sm font-medium" disabled={loading}>
+          {loading ? (
+            <span className="flex items-center gap-2">
+              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+              Création…
+            </span>
+          ) : (
+            <span className="flex items-center gap-2">
+              Créer le compte
+              <ArrowRight className="h-4 w-4" />
+            </span>
+          )}
         </Button>
       </form>
     </div>

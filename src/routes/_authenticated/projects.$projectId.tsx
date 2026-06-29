@@ -15,11 +15,11 @@ import { toast } from "sonner";
 import JSZip from "jszip";
 import {
   ArrowLeft, Folder, FolderPlus, Upload, Camera, LogOut, Image as ImageIcon,
-  Trash2, Download, X, CheckSquare, Square, Package, Video,
+  Trash2, Download, X, CheckSquare, Square, Video,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId")({
-  head: () => ({ meta: [{ title: "Projet" }] }),
+  head: () => ({ meta: [{ title: "Projet — Studio Client" }] }),
   component: ProjectView,
 });
 
@@ -61,7 +61,6 @@ function ProjectView() {
   useEffect(() => { load(); }, [projectId]);
 
   useEffect(() => {
-    // build breadcrumb
     const path: Folder[] = [];
     let id: string | null = currentFolderId;
     while (id) {
@@ -94,21 +93,21 @@ function ProjectView() {
     load();
   }
 
-  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
-const ALLOWED_EXTS = ["jpg", "jpeg", "png", "gif", "webp", "svg", "mp4", "mov", "avi", "webm"];
+  const MAX_FILE_SIZE = 100 * 1024 * 1024;
+  const ALLOWED_EXTS = ["jpg", "jpeg", "png", "gif", "webp", "svg", "mp4", "mov", "avi", "webm"];
 
-function isValidFile(file: File): string | null {
-  if (file.size > MAX_FILE_SIZE) return `${file.name}: Taille max 100MB`;
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
-  if (!ALLOWED_EXTS.includes(ext)) return `${file.name}: Type non autorisé`;
-  return null;
-}
+  function isValidFile(file: File): string | null {
+    if (file.size > MAX_FILE_SIZE) return `${file.name}: Taille max 100MB`;
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    if (!ALLOWED_EXTS.includes(ext)) return `${file.name}: Type non autorisé`;
+    return null;
+  }
 
-function sanitizeFileName(name: string): string {
-  return name.replace(/[^a-zA-Z0-9._-]/g, "_").substring(0, 200);
-}
+  function sanitizeFileName(name: string): string {
+    return name.replace(/[^a-zA-Z0-9._-]/g, "_").substring(0, 200);
+  }
 
-async function uploadFiles(files: FileList) {
+  async function uploadFiles(files: FileList) {
     if (!project) return;
     const clientId = project.client_user_id;
 
@@ -241,16 +240,16 @@ async function uploadFiles(files: FileList) {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground">
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-card/80 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
+          <Link to="/dashboard" className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <Camera className="h-4 w-4" />
             </div>
-            <span className="font-semibold">Studio Client</span>
+            <span className="text-base font-semibold tracking-tight">Studio Client</span>
           </Link>
-          <Button variant="ghost" size="sm" onClick={signOut}>
-            <LogOut className="mr-2 h-4 w-4" /> Déconnexion
+          <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground hover:text-foreground">
+            <LogOut className="mr-1.5 h-4 w-4" /> Déconnexion
           </Button>
         </div>
       </header>
@@ -259,22 +258,22 @@ async function uploadFiles(files: FileList) {
         <Link
           to={isAdmin && project ? "/clients/$clientId" : "/dashboard"}
           params={isAdmin && project ? { clientId: project.client_user_id } : {}}
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors-fast hover:text-foreground"
         >
-          <ArrowLeft className="mr-1 h-4 w-4" /> Retour
+          <ArrowLeft className="h-4 w-4" /> Retour
         </Link>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">{project?.name ?? "…"}</h1>
-            <nav className="mt-1 flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
-              <button onClick={() => setCurrentFolderId(null)} className="hover:text-primary">
+            <h1 className="text-2xl font-bold tracking-tight">{project?.name ?? "…"}</h1>
+            <nav className="mt-2 flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+              <button onClick={() => setCurrentFolderId(null)} className="transition-colors-fast hover:text-primary">
                 Racine
               </button>
               {breadcrumb.map((f) => (
-                <span key={f.id} className="flex items-center gap-1">
-                  <span>/</span>
-                  <button onClick={() => setCurrentFolderId(f.id)} className="hover:text-primary">{f.name}</button>
+                <span key={f.id} className="flex items-center gap-1.5">
+                  <span className="text-border">/</span>
+                  <button onClick={() => setCurrentFolderId(f.id)} className="transition-colors-fast hover:text-primary">{f.name}</button>
                 </span>
               ))}
             </nav>
@@ -283,12 +282,14 @@ async function uploadFiles(files: FileList) {
             <div className="flex gap-2">
               <Dialog open={openFolder} onOpenChange={setOpenFolder}>
                 <DialogTrigger asChild>
-                  <Button variant="outline"><FolderPlus className="mr-2 h-4 w-4" /> Dossier</Button>
+                  <Button variant="outline" className="shadow-sm">
+                    <FolderPlus className="mr-1.5 h-4 w-4" /> Dossier
+                  </Button>
                 </DialogTrigger>
                 <CreateFolderDialog onSubmit={createFolder} />
               </Dialog>
-              <Button onClick={() => fileInput.current?.click()}>
-                <Upload className="mr-2 h-4 w-4" /> Téléverser
+              <Button onClick={() => fileInput.current?.click()} className="shadow-sm">
+                <Upload className="mr-1.5 h-4 w-4" /> Téléverser
               </Button>
               <input
                 ref={fileInput} type="file" multiple accept="image/*,video/*" className="hidden"
@@ -300,8 +301,9 @@ async function uploadFiles(files: FileList) {
             <Button
               variant={selectMode ? "default" : "outline"}
               onClick={() => { if (selectMode) clearSelection(); else setSelectMode(true); }}
+              className="shadow-sm"
             >
-              <CheckSquare className="mr-2 h-4 w-4" />
+              <CheckSquare className="mr-1.5 h-4 w-4" />
               {selectMode ? "Annuler" : "Sélectionner"}
             </Button>
           )}
@@ -310,17 +312,18 @@ async function uploadFiles(files: FileList) {
         {visibleFolders.length > 0 && (
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {visibleFolders.map((f) => (
-              <Card key={f.id} className="group relative cursor-pointer p-4 transition hover:border-primary"
+              <Card key={f.id} className="group relative cursor-pointer p-4 shadow-sm transition-all-fast hover:border-primary/50 hover:shadow-card-hover"
                 onClick={() => setCurrentFolderId(f.id)}>
                 <div className="flex items-center gap-3">
-                  <Folder className="h-6 w-6 text-primary" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all-fast group-hover:bg-primary group-hover:text-primary-foreground">
+                    <Folder className="h-5 w-5" />
+                  </div>
                   <span className="truncate font-medium">{f.name}</span>
                 </div>
                 {isAdmin && (
-                  <Button variant="ghost" size="icon"
-                    className="absolute right-1 top-1 opacity-0 group-hover:opacity-100"
+                  <Button variant="ghost" size="icon" className="absolute right-2 top-2 h-7 w-7 opacity-0 transition-all-fast group-hover:opacity-100"
                     onClick={(e) => { e.stopPropagation(); deleteFolder(f.id); }}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
+                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
                   </Button>
                 )}
               </Card>
@@ -340,51 +343,61 @@ async function uploadFiles(files: FileList) {
             ))}
           </div>
         ) : visibleFolders.length === 0 ? (
-          <Card className="mt-6 py-16 text-center">
-            <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
-            <p className="mt-3 text-sm text-muted-foreground">
-              {isAdmin ? "Aucun contenu. Créez un dossier ou téléversez des photos." : "Aucune photo dans ce dossier."}
+          <Card className="mt-6 flex flex-col items-center justify-center py-16 shadow-sm">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
+              <ImageIcon className="h-7 w-7 text-muted-foreground" />
+            </div>
+            <p className="mt-4 text-sm font-medium text-foreground">
+              {isAdmin ? "Aucun contenu" : "Aucune photo"}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {isAdmin ? "Créez un dossier ou téléversez des photos." : "Aucune photo dans ce dossier."}
             </p>
           </Card>
         ) : null}
 
         {selectMode && selected.size > 0 && (
-          <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-full bg-primary px-6 py-3 text-primary-foreground shadow-lg">
-            <span>{selected.size} sélectionnée(s)</span>
-            <Button variant="secondary" size="sm" onClick={selectAll}>Tout</Button>
-            <div className="flex rounded-md bg-white/20 p-0.5">
+          <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-2xl bg-foreground px-6 py-3.5 text-background shadow-lg">
+            <span className="text-sm font-medium">{selected.size} sélectionnée(s)</span>
+            <Button variant="secondary" size="sm" onClick={selectAll} className="h-8">Tout</Button>
+            <div className="flex rounded-lg bg-black/10 p-0.5">
               <button
                 onClick={() => setDownloadMode("single")}
-                className={`rounded px-2 py-1 text-xs transition ${downloadMode === "single" ? "bg-white text-primary" : "hover:bg-white/20"}`}
+                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all-fast ${downloadMode === "single" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
               >
                 Fichiers
               </button>
               <button
                 onClick={() => setDownloadMode("zip")}
-                className={`rounded px-2 py-1 text-xs transition ${downloadMode === "zip" ? "bg-white text-primary" : "hover:bg-white/20"}`}
+                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all-fast ${downloadMode === "zip" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
               >
                 ZIP
               </button>
             </div>
-            <Button size="sm" onClick={downloadSelected} disabled={downloading}>
-              <Download className="mr-2 h-4 w-4" />
-              {downloading ? "..." : "Télécharger"}
+            <Button size="sm" onClick={downloadSelected} disabled={downloading} className="h-8">
+              <Download className="mr-1.5 h-3.5 w-3.5" />
+              {downloading ? "…" : "Télécharger"}
             </Button>
           </div>
         )}
       </main>
 
       {viewer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6" onClick={() => setViewer(null)}>
-          <Button variant="ghost" size="icon" className="absolute right-4 top-4 text-white hover:bg-white/10"
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-6" onClick={() => setViewer(null)}>
+          <Button variant="ghost" size="icon" className="absolute right-4 top-4 h-10 w-10 text-white hover:bg-white/10"
             onClick={(e) => { e.stopPropagation(); setViewer(null); }}>
-            <X className="h-6 w-6" />
+            <X className="h-5 w-5" />
           </Button>
-          {viewer.isVideo ? (
-            <video src={viewer.url} controls className="max-h-full max-w-full rounded" autoPlay />
-          ) : (
-            <img src={viewer.url} alt={viewer.name} className="max-h-full max-w-full rounded object-contain" />
-          )}
+          <div className="max-h-[90vh] max-w-[90vw]">
+            {viewer.isVideo ? (
+              <video src={viewer.url} controls className="max-h-full max-w-full rounded-lg" autoPlay />
+            ) : (
+              <img src={viewer.url} alt={viewer.name} className="max-h-full max-w-full rounded-lg object-contain" />
+            )}
+          </div>
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-4 py-2 text-sm text-white/80 backdrop-blur-sm">
+            {viewer.name}
+          </div>
         </div>
       )}
     </div>
@@ -408,40 +421,40 @@ function MediaTile({ media, isAdmin, selectMode, isSelected, onToggle, onOpen, o
   }, [media.storage_path, isVideo]);
 
   return (
-    <Card className="group relative aspect-square overflow-hidden p-0">
+    <Card className="group relative aspect-square overflow-hidden p-0 shadow-sm transition-all-fast hover:shadow-card-hover">
       <button
         onClick={(e) => { if (selectMode) { e.stopPropagation(); onToggle(); } else onOpen(); }}
         className="block h-full w-full"
       >
         {isVideo ? (
           <div className="grid h-full w-full place-items-center bg-muted">
-            <Video className="h-10 w-10 text-primary" />
+            <Video className="h-10 w-10 text-primary/60" />
           </div>
         ) : thumb ? (
-          <img src={thumb} alt={media.name} className={`h-full w-full object-cover transition ${!selectMode ? "group-hover:scale-105" : ""}`} />
+          <img src={thumb} alt={media.name} className={`h-full w-full object-cover transition-transform duration-300 ${!selectMode ? "group-hover:scale-105" : ""}`} />
         ) : (
           <div className="grid h-full w-full place-items-center bg-muted">
-            <ImageIcon className="h-8 w-8 text-muted-foreground" />
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           </div>
         )}
       </button>
       {selectMode && (
         <button
           onClick={onToggle}
-          className={`absolute left-2 top-2 rounded-full bg-black/50 p-1 transition ${isSelected ? "text-yellow-400" : "text-white"}`}
+          className={`absolute left-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-lg transition-all-fast ${isSelected ? "bg-primary text-primary-foreground shadow-sm" : "bg-black/40 text-white backdrop-blur-sm"}`}
         >
-          {isSelected ? <CheckSquare className="h-5 w-5" /> : <Square className="h-5 w-5" />}
+          {isSelected ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
         </button>
       )}
       {!selectMode && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 transition group-hover:opacity-100">
-          <span className="truncate text-xs text-white">{media.name}</span>
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <span className="truncate text-xs font-medium text-white">{media.name}</span>
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-7 w-7 text-white hover:bg-white/20" onClick={onDownload}>
+            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-white hover:bg-white/20" onClick={onDownload}>
               <Download className="h-3.5 w-3.5" />
             </Button>
             {isAdmin && (
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-white hover:bg-white/20" onClick={onDelete}>
+              <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-white hover:bg-white/20" onClick={onDelete}>
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             )}
@@ -456,11 +469,13 @@ function CreateFolderDialog({ onSubmit }: { onSubmit: (n: string) => void }) {
   const [name, setName] = useState("");
   return (
     <DialogContent>
-      <DialogHeader><DialogTitle>Nouveau dossier</DialogTitle></DialogHeader>
+      <DialogHeader>
+        <DialogTitle>Nouveau dossier</DialogTitle>
+      </DialogHeader>
       <form onSubmit={(e) => { e.preventDefault(); onSubmit(name); setName(""); }} className="space-y-4">
         <div>
-          <Label htmlFor="fname">Nom du dossier</Label>
-          <Input id="fname" value={name} onChange={(e) => setName(e.target.value)} required />
+          <Label htmlFor="fname" className="text-sm font-medium">Nom du dossier</Label>
+          <Input id="fname" value={name} onChange={(e) => setName(e.target.value)} required className="mt-1.5" />
         </div>
         <DialogFooter><Button type="submit">Créer</Button></DialogFooter>
       </form>

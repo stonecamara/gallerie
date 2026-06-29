@@ -74,45 +74,50 @@ function ClientDetail() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground">
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-card/80 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
+          <Link to="/dashboard" className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <Camera className="h-4 w-4" />
             </div>
-            <span className="font-semibold">Studio Client</span>
+            <span className="text-base font-semibold tracking-tight">Studio Client</span>
           </Link>
-          <Button variant="ghost" size="sm" onClick={signOut}>
-            <LogOut className="mr-2 h-4 w-4" /> Déconnexion
+          <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground hover:text-foreground">
+            <LogOut className="mr-1.5 h-4 w-4" /> Déconnexion
           </Button>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-8">
-        <Link to="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="mr-1 h-4 w-4" /> Retour aux clients
+        <Link to="/dashboard" className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors-fast hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" /> Retour aux clients
         </Link>
 
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-5 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">{client?.full_name ?? "Client"}</h1>
-            <p className="text-sm text-muted-foreground">
-              Code <span className="font-mono text-primary">{client?.client_code}</span>
+            <h1 className="text-2xl font-bold tracking-tight">{client?.full_name ?? "Client"}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Code client{" "}
+              <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 font-mono text-sm font-medium text-primary">
+                {client?.client_code}
+              </span>
             </p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button><Plus className="mr-2 h-4 w-4" /> Nouveau projet</Button>
+              <Button className="shadow-sm"><Plus className="mr-1.5 h-4 w-4" /> Nouveau projet</Button>
             </DialogTrigger>
             <CreateProjectDialog onSubmit={createProject} />
           </Dialog>
           <Dialog open={!!renameProject} onOpenChange={(o) => !o && setRenameProject(null)}>
             <DialogContent>
-              <DialogHeader><DialogTitle>Renommer le projet</DialogTitle></DialogHeader>
+              <DialogHeader>
+                <DialogTitle>Renommer le projet</DialogTitle>
+              </DialogHeader>
               <form onSubmit={(e) => { e.preventDefault(); handleRename(); }} className="space-y-4">
                 <div>
-                  <Label htmlFor="rename">Nouveau nom</Label>
-                  <Input id="rename" value={newName} onChange={(e) => setNewName(e.target.value)} required />
+                  <Label htmlFor="rename" className="text-sm font-medium">Nouveau nom</Label>
+                  <Input id="rename" value={newName} onChange={(e) => setNewName(e.target.value)} required className="mt-1.5" />
                 </div>
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setRenameProject(null)}>Annuler</Button>
@@ -123,23 +128,28 @@ function ClientDetail() {
           </Dialog>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {projects.length === 0 ? (
-            <Card className="col-span-full py-12 text-center">
-              <Folder className="mx-auto h-10 w-10 text-muted-foreground" />
-              <p className="mt-3 text-sm text-muted-foreground">Aucun projet. Créez le premier.</p>
+            <Card className="col-span-full flex flex-col items-center justify-center py-16 shadow-sm">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
+                <Folder className="h-7 w-7 text-muted-foreground" />
+              </div>
+              <p className="mt-4 text-sm font-medium text-foreground">Aucun projet</p>
+              <p className="mt-1 text-sm text-muted-foreground">Créez le premier projet pour ce client.</p>
             </Card>
           ) : projects.map((p) => (
-            <Card key={p.id} className="group relative p-5 transition hover:border-primary">
+            <Card key={p.id} className="group relative p-5 shadow-sm transition-all-fast hover:border-primary/50 hover:shadow-card-hover">
               <Link to="/projects/$projectId" params={{ projectId: p.id }} className="block">
-                <Folder className="h-8 w-8 text-primary" />
-                <div className="mt-3 font-semibold">{p.name}</div>
-                {p.description && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.description}</p>}
-                <div className="mt-2 text-xs text-muted-foreground">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all-fast group-hover:bg-primary group-hover:text-primary-foreground">
+                  <Folder className="h-5 w-5" />
+                </div>
+                <div className="mt-4 font-semibold tracking-tight">{p.name}</div>
+                {p.description && <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{p.description}</p>}
+                <div className="mt-3 text-xs text-muted-foreground">
                   {new Date(p.created_at).toLocaleDateString("fr-FR")}
                 </div>
               </Link>
-              <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition group-hover:opacity-100">
+              <div className="absolute right-3 top-3 flex gap-1 opacity-0 transition-all-fast group-hover:opacity-100">
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openRename(p)}>
                   <Pencil className="h-4 w-4" />
                 </Button>
@@ -164,15 +174,17 @@ function CreateProjectDialog({ onSubmit }: { onSubmit: (n: string, d: string) =>
   const [desc, setDesc] = useState("");
   return (
     <DialogContent>
-      <DialogHeader><DialogTitle>Nouveau projet</DialogTitle></DialogHeader>
+      <DialogHeader>
+        <DialogTitle>Nouveau projet</DialogTitle>
+      </DialogHeader>
       <form onSubmit={(e) => { e.preventDefault(); onSubmit(sanitize(name), sanitize(desc)); }} className="space-y-4">
         <div>
-          <Label htmlFor="pname">Nom du projet</Label>
-          <Input id="pname" value={name} onChange={(e) => setName(e.target.value)} required maxLength={200} />
+          <Label htmlFor="pname" className="text-sm font-medium">Nom du projet</Label>
+          <Input id="pname" value={name} onChange={(e) => setName(e.target.value)} required maxLength={200} className="mt-1.5" />
         </div>
         <div>
-          <Label htmlFor="pdesc">Description (optionnel)</Label>
-          <Textarea id="pdesc" value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} maxLength={500} />
+          <Label htmlFor="pdesc" className="text-sm font-medium">Description (optionnel)</Label>
+          <Textarea id="pdesc" value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} maxLength={500} className="mt-1.5" />
         </div>
         <DialogFooter><Button type="submit">Créer</Button></DialogFooter>
       </form>
