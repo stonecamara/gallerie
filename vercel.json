@@ -1,6 +1,6 @@
 {
   "buildCommand": "bun run build",
-  "outputDirectory": "dist",
+  "outputDirectory": "dist/client",
   "installCommand": "bun install",
   "framework": null,
   "functions": {
