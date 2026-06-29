@@ -1,4 +1,14 @@
 {
   "buildCommand": "bun run build",
-  "outputDirectory": ".vercel/output"
+  "outputDirectory": "dist",
+  "installCommand": "bun install",
+  "framework": null,
+  "functions": {
+    "api/server.js": {
+      "includeFiles": "dist/**"
+    }
+  },
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/api/server" }
+  ]
 }
