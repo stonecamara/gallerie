@@ -258,9 +258,7 @@ function ProjectView() {
       <header className="sticky top-0 z-50 border-b border-border/50 bg-card/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
           <Link to="/dashboard" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-              <Camera className="h-4 w-4" />
-            </div>
+            <img src="/logo.png" alt="StoneShot" className="h-9 w-9 rounded-xl" />
             <span className="text-base font-semibold tracking-tight">StoneShot</span>
           </Link>
           <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground hover:text-foreground">

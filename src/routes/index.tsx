@@ -17,9 +17,7 @@ function Index() {
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-              <Camera className="h-5 w-5" />
-            </div>
+            <img src="/logo.png" alt="StoneShot" className="h-10 w-10 rounded-xl" />
             <span className="text-lg font-semibold tracking-tight">StoneShot</span>
           </Link>
           <Link
@@ -112,7 +110,7 @@ function Index() {
       <footer className="border-t border-border/50 bg-card/50">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Camera className="h-4 w-4" />
+            <img src="/logo.png" alt="StoneShot" className="h-4 w-4" />
             © {new Date().getFullYear()} StoneShot
           </div>
           <div className="text-xs text-muted-foreground">
