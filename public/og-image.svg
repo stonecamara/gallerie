@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed"/>
+      <stop offset="100%" style="stop-color:#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g transform="translate(420, 180)">
+    <rect x="0" y="0" width="120" height="120" rx="28" fill="white" fill-opacity="0.2"/>
+    <path d="M60 15C32.39 15 10 37.39 10 60s22.39 45 50 45 50-22.39 50-45S87.61 15 60 15zm0 80c-19.33 0-35-15.67-35-35s15.67-35 35-35 35 15.67 35 35-15.67 35-35 35z" fill="white" opacity="0.4"/>
+    <circle cx="35" cy="60" r="10" fill="white"/>
+    <circle cx="85" cy="60" r="10" fill="white"/>
+    <path d="M35 50v-12c0-3.31 2.69-6 6-6h12c3.31 0 6 2.69 6 6v12" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M85 70v12c0 3.31-2.69 6-6 6h-12c-3.31 0-6-2.69-6-6v-12" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </g>
+  <text x="600" y="360" font-family="Plus Jakarta Sans, Inter, sans-serif" font-size="72" font-weight="700" fill="white" text-anchor="middle" letter-spacing="-1">StoneShot</text>
+  <text x="600" y="420" font-family="Plus Jakarta Sans, Inter, sans-serif" font-size="28" fill="white" fill-opacity="0.8" text-anchor="middle">Livraison Photo Privée</text>
+</svg>

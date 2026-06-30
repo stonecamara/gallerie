@@ -85,6 +85,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "StoneShot — Livraison Photo Privée" },
       { property: "og:description", content: "Espace privé sécurisé pour accéder à vos projets photo et vidéo." },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "/logo.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
