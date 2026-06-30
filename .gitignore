@@ -7,3 +7,5 @@ dist
 .output
 *.local
 .wrangler
+.vercel
+.env*
