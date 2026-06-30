@@ -28,7 +28,9 @@ function AuthPage() {
     <div className="grid min-h-screen lg:grid-cols-2">
       <div className="hidden bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground lg:flex lg:flex-col lg:justify-between lg:p-12">
           <Link to="/" className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="StoneShot" className="h-10 w-10 rounded-xl" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+              <Camera className="h-5 w-5" />
+            </div>
             <span className="text-lg font-semibold">StoneShot</span>
           </Link>
         <div>
@@ -56,7 +58,9 @@ function AuthPage() {
       <div className="flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-md">
           <Link to="/" className="mb-8 inline-flex items-center gap-2 lg:hidden">
-            <img src="/logo.png" alt="StoneShot" className="h-9 w-9 rounded-lg" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Camera className="h-4 w-4" />
+            </div>
             <span className="font-semibold">StoneShot</span>
           </Link>
 
