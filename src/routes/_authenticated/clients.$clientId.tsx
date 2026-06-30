@@ -166,7 +166,14 @@ function ClientDetail() {
 }
 
 function sanitize(str: string): string {
-  return str.replace(/[<>'"&]/g, "").trim().substring(0, 200);
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .trim()
+    .substring(0, 200);
 }
 
 function CreateProjectDialog({ onSubmit }: { onSubmit: (n: string, d: string) => void }) {

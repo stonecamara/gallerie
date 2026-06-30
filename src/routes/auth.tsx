@@ -1,14 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { bootstrapAdmin, checkAdminExists } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Camera, ArrowRight, Lock, User } from "lucide-react";
+import { checkRateLimit } from "@/lib/utils";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Connexion — Studio Client" }] }),
@@ -17,18 +16,13 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const bootstrap = useServerFn(bootstrapAdmin);
-  const check = useServerFn(checkAdminExists);
-
-  const [hasAdmin, setHasAdmin] = useState<boolean | null>(null);
   const [mode, setMode] = useState<"client" | "admin">("client");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) navigate({ to: "/dashboard" });
     });
-    check().then((r) => setHasAdmin(r.exists)).catch(() => setHasAdmin(true));
-  }, [check, navigate]);
+  }, [navigate]);
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
@@ -70,34 +64,21 @@ function AuthPage() {
             <span className="font-semibold">Studio Client</span>
           </Link>
 
-          {hasAdmin === false ? (
-            <BootstrapForm
-              onDone={async (email, password) => {
-                await bootstrap({ data: { email, password, fullName: "Administrateur" } });
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-                navigate({ to: "/dashboard" });
-              }}
-            />
-          ) : (
-            <>
-              <h1 className="text-2xl font-bold tracking-tight">Bienvenue</h1>
-              <p className="mt-1.5 text-sm text-muted-foreground">Connectez-vous à votre espace client.</p>
+          <h1 className="text-2xl font-bold tracking-tight">Bienvenue</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">Connectez-vous à votre espace client.</p>
 
-              <Tabs value={mode} onValueChange={(v) => setMode(v as "client" | "admin")} className="mt-8">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="client">Client</TabsTrigger>
-                  <TabsTrigger value="admin">Administrateur</TabsTrigger>
-                </TabsList>
-                <TabsContent value="client" className="mt-6">
-                  <ClientLogin onSuccess={() => navigate({ to: "/dashboard" })} />
-                </TabsContent>
-                <TabsContent value="admin" className="mt-6">
-                  <AdminLogin onSuccess={() => navigate({ to: "/dashboard" })} />
-                </TabsContent>
-              </Tabs>
-            </>
-          )}
+          <Tabs value={mode} onValueChange={(v) => setMode(v as "client" | "admin")} className="mt-8">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="client">Client</TabsTrigger>
+              <TabsTrigger value="admin">Administrateur</TabsTrigger>
+            </TabsList>
+            <TabsContent value="client" className="mt-6">
+              <ClientLogin onSuccess={() => navigate({ to: "/dashboard" })} />
+            </TabsContent>
+            <TabsContent value="admin" className="mt-6">
+              <AdminLogin onSuccess={() => navigate({ to: "/dashboard" })} />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
@@ -114,6 +95,10 @@ function ClientLogin({ onSuccess }: { onSuccess: () => void }) {
     const clean = code.replace(/\D/g, "");
     if (clean.length !== 8) {
       toast.error("Le code doit contenir 8 chiffres.");
+      return;
+    }
+    if (!checkRateLimit("client-login", 5, 60_000)) {
+      toast.error("Trop de tentatives. Réessayez dans 1 minute.");
       return;
     }
     setLoading(true);
@@ -167,6 +152,10 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
   const [loading, setLoading] = useState(false);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!checkRateLimit("admin-login", 5, 60_000)) {
+      toast.error("Trop de tentatives. Réessayez dans 1 minute.");
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
@@ -197,53 +186,5 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
         )}
       </Button>
     </form>
-  );
-}
-
-function BootstrapForm({ onDone }: { onDone: (email: string, password: string) => Promise<void> }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (password.length < 8) { toast.error("Mot de passe : 8 caractères minimum."); return; }
-    setLoading(true);
-    try { await onDone(email, password); toast.success("Compte administrateur créé."); }
-    catch (err: any) { toast.error(err?.message ?? "Erreur"); }
-    finally { setLoading(false); }
-  }
-  return (
-    <div>
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
-        <Lock className="h-6 w-6" />
-      </div>
-      <h1 className="text-2xl font-bold tracking-tight">Première utilisation</h1>
-      <p className="mt-1.5 text-sm text-muted-foreground">
-        Créez le compte administrateur principal de l'agence.
-      </p>
-      <form onSubmit={submit} className="mt-6 space-y-5">
-        <div>
-          <Label htmlFor="bemail" className="text-sm font-medium">Email administrateur</Label>
-          <Input id="bemail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1.5 h-12" required />
-        </div>
-        <div>
-          <Label htmlFor="bpw" className="text-sm font-medium">Mot de passe (8+ caractères)</Label>
-          <Input id="bpw" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1.5 h-12" required />
-        </div>
-        <Button type="submit" className="h-12 w-full text-sm font-medium" disabled={loading}>
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-              Création…
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">
-              Créer le compte
-              <ArrowRight className="h-4 w-4" />
-            </span>
-          )}
-        </Button>
-      </form>
-    </div>
   );
 }

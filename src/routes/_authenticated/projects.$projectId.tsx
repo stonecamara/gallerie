@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { getSignedImageUrl } from "@/lib/admin.functions";
+import { getSignedImageUrl, validateUpload } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,6 +49,7 @@ function ProjectView() {
   const [downloadMode, setDownloadMode] = useState<"single" | "zip">("single");
   const fileInput = useRef<HTMLInputElement>(null);
   const getUrl = useServerFn(getSignedImageUrl);
+  const validate = useServerFn(validateUpload);
 
   async function load() {
     const { data: p } = await supabase.from("projects").select("*").eq("id", projectId).maybeSingle();
@@ -115,6 +116,20 @@ function ProjectView() {
     for (const file of Array.from(files)) {
       const error = isValidFile(file);
       if (error) { toast.error(error); continue; }
+
+      try {
+        await validate({
+          data: {
+            projectId,
+            fileName: file.name,
+            fileSize: file.size,
+            mimeType: file.type,
+          },
+        });
+      } catch (e: any) {
+        toast.error(`${file.name}: ${e?.message ?? "Refusé"}`);
+        continue;
+      }
       validFiles.push(file);
     }
     if (validFiles.length === 0) return;
