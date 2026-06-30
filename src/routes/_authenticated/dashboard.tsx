@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { Camera, LogOut, Plus, Users, Folder, Trash2, Copy, Key, LayoutDashboard, HardDrive, Image as ImageIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Tableau de bord — Studio Client" }] }),
+  head: () => ({ meta: [{ title: "Tableau de bord — StoneShot" }] }),
   component: Dashboard,
 });
 
@@ -51,7 +51,7 @@ function Dashboard() {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <Camera className="h-4 w-4" />
             </div>
-            <span className="text-base font-semibold tracking-tight">Studio Client</span>
+            <span className="text-base font-semibold tracking-tight">StoneShot</span>
           </Link>
           <div className="flex items-center gap-4">
             <div className="hidden text-right sm:block">

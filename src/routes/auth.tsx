@@ -10,7 +10,7 @@ import { Camera, ArrowRight, Lock, User } from "lucide-react";
 import { checkRateLimit } from "@/lib/utils";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Connexion — Studio Client" }] }),
+  head: () => ({ meta: [{ title: "Connexion — StoneShot" }] }),
   component: AuthPage,
 });
 
@@ -31,7 +31,7 @@ function AuthPage() {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
             <Camera className="h-5 w-5" />
           </div>
-          <span className="text-lg font-semibold">Studio Client</span>
+          <span className="text-lg font-semibold">StoneShot</span>
         </Link>
         <div>
           <h2 className="text-3xl font-bold leading-tight tracking-tight">
@@ -52,7 +52,7 @@ function AuthPage() {
             </div>
           </div>
         </div>
-        <p className="text-sm text-primary-foreground/60">© {new Date().getFullYear()} Studio Client — Tous droits réservés</p>
+        <p className="text-sm text-primary-foreground/60">© {new Date().getFullYear()} StoneShot — Tous droits réservés</p>
       </div>
 
       <div className="flex items-center justify-center p-6 lg:p-12">
@@ -61,7 +61,7 @@ function AuthPage() {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Camera className="h-4 w-4" />
             </div>
-            <span className="font-semibold">Studio Client</span>
+            <span className="font-semibold">StoneShot</span>
           </Link>
 
           <h1 className="text-2xl font-bold tracking-tight">Bienvenue</h1>

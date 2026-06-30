@@ -80,7 +80,7 @@ function ClientDetail() {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <Camera className="h-4 w-4" />
             </div>
-            <span className="text-base font-semibold tracking-tight">Studio Client</span>
+            <span className="text-base font-semibold tracking-tight">StoneShot</span>
           </Link>
           <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground hover:text-foreground">
             <LogOut className="mr-1.5 h-4 w-4" /> Déconnexion

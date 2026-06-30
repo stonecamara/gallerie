@@ -79,10 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Studio Client — Livraison Photo Privée" },
+      { title: "StoneShot — Livraison Photo Privée" },
       { name: "description", content: "Plateforme privée de livraison de photos et vidéos pour les clients de l'agence. Connectez-vous avec votre code à 8 chiffres." },
       { name: "theme-color", content: "#7c3aed" },
-      { property: "og:title", content: "Studio Client — Livraison Photo Privée" },
+      { property: "og:title", content: "StoneShot — Livraison Photo Privée" },
       { property: "og:description", content: "Espace privé sécurisé pour accéder à vos projets photo et vidéo." },
       { property: "og:type", content: "website" },
     ],

@@ -4,7 +4,7 @@ import { Camera, FolderLock, Image as ImageIcon, Shield, Zap, CheckCircle } from
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Studio Client — Livraison Photo Professionnelle" },
+      { title: "StoneShot — Livraison Photo Professionnelle" },
       { name: "description", content: "Plateforme privée de livraison de photos pour les clients de l'agence." },
     ],
   }),
@@ -20,7 +20,7 @@ function Index() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <Camera className="h-5 w-5" />
             </div>
-            <span className="text-lg font-semibold tracking-tight">Studio Client</span>
+            <span className="text-lg font-semibold tracking-tight">StoneShot</span>
           </Link>
           <Link
             to="/auth"
@@ -113,7 +113,7 @@ function Index() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Camera className="h-4 w-4" />
-            © {new Date().getFullYear()} Studio Client
+            © {new Date().getFullYear()} StoneShot
           </div>
           <div className="text-xs text-muted-foreground">
             Tous droits réservés
